@@ -210,7 +210,17 @@ local function TTDLogic()
         TrackBossCheckpoint(targetName, EHealthPercent);
 
         if EHealthPercent == 100 then
-            if targetName ~= 'Spore' and targetName ~= 'Fallout Slime' and targetName ~= 'Plagued Champion' then
+            if targetName ~= 'Spore' and
+			   targetName ~= 'Fallout Slime' and
+			   targetName ~= 'Plagued Champion' and
+			   targetName ~= 'Living Dragonfire' and
+			   targetName ~= 'Draconic Mana Gem' and
+			   targetName ~= 'Onyxian Whelp' and
+			   targetName ~= 'Adession' and
+			   targetName ~= 'Vatryrion' and
+			   targetName ~= 'Omevian' and
+			   targetName ~= 'Hazerion'
+			then
                 -- may not want to restart combat if you tab to one of these monsters
                 combatStart = GetTime();
             end
