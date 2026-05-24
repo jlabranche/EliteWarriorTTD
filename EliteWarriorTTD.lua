@@ -1,6 +1,48 @@
 local lastCheckTime = 0;
 local checkInterval = 0.2;
+EliteWarrior = EliteWarrior or {}
+EliteWarriorTTDDB = EliteWarriorTTDDB or {}
+
+local defaultPosition = {
+    point = "BOTTOMLEFT",
+    relativePoint = "BOTTOMLEFT",
+    x = math.floor(GetScreenWidth() * 0.475),
+    y = math.floor(GetScreenHeight() * 0.21)
+}
+
+local function GetTTDPosition()
+    return EliteWarriorTTDDB.position or defaultPosition
+end
+
+local ttdAnchor = CreateFrame("Frame", "EliteWarriorTTDAnchor", UIParent)
+ttdAnchor:SetWidth(220)
+ttdAnchor:SetHeight(120)
+ttdAnchor:SetMovable(true)
+ttdAnchor:EnableMouse(true)
+ttdAnchor:RegisterForDrag("LeftButton")
+ttdAnchor:SetClampedToScreen(true)
+
+local pos = GetTTDPosition()
+ttdAnchor:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
+
+ttdAnchor:SetScript("OnDragStart", function(self)
+    self:StartMoving()
+end)
+
+ttdAnchor:SetScript("OnDragStop", function(self)
+    self:StopMovingOrSizing()
+
+    local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
+    EliteWarriorTTDDB.position = {
+        point = point,
+        relativePoint = relativePoint,
+        x = xOfs,
+        y = yOfs
+    }
+end)
+
 EliteWarrior.TTD = CreateFrame("Frame", nil, UIParent);
+
 
 local inCombat = false;
 
@@ -15,14 +57,17 @@ local combatStart = GetTime();
 
 local function TTD_Show()
     if (inCombat) then
-        textTimeTillDeath:SetPoint("BOTTOMLEFT", math.floor(GetScreenWidth()*.475), math.floor(GetScreenHeight()*.11));
-        textTimeTillDeathText:SetText("Time Till Death:");
-        local point, relativeTo, relativePoint, xOfs, yOfs = textTimeTillDeath:GetPoint();
-        textTimeTillDeathText:SetPoint("BOTTOMLEFT", xOfs, yOfs+28);
+        textTimeTillDeath:ClearAllPoints()
+        textTimeTillDeath:SetPoint("BOTTOMLEFT", ttdAnchor, "BOTTOMLEFT", 0, 0)
+
+        textTimeTillDeathText:ClearAllPoints()
+        textTimeTillDeathText:SetPoint("BOTTOMLEFT", ttdAnchor, "BOTTOMLEFT", 0, 28)
+
+        textTimeTillDeathText:SetText("Time Till Death:")
     end
 end
+
 local function TTD_Hide()
-    battleShoutIcon:Hide();
     textTimeTillDeath:SetText("-.--");
 end
 
@@ -90,6 +135,28 @@ EliteWarrior.TTD:SetScript("OnEvent", function()
         inCombat = false;
     end
 end);
+
+SLASH_ELITEWARRIORTTD1 = "/ttd"
+
+SlashCmdList["ELITEWARRIORTTD"] = function(msg)
+    if msg == "lock" then
+        ttdAnchor:EnableMouse(false)
+        print("EliteWarriorTTD locked. Click-through enabled.")
+    elseif msg == "unlock" then
+        ttdAnchor:EnableMouse(true)
+        print("EliteWarriorTTD unlocked. Drag the timer text to move it.")
+    elseif msg == "reset" then
+        EliteWarriorTTDDB.position = nil
+        ttdAnchor:ClearAllPoints()
+        ttdAnchor:SetPoint(defaultPosition.point, UIParent, defaultPosition.relativePoint, defaultPosition.x, defaultPosition.y)
+        print("EliteWarriorTTD position reset")
+    else
+        print("/ttd unlock")
+        print("/ttd lock")
+        print("/ttd reset")
+    end
+end
+
 EliteWarrior.TTD:RegisterEvent("PLAYER_REGEN_ENABLED");
 EliteWarrior.TTD:RegisterEvent("PLAYER_REGEN_DISABLED");
 EliteWarrior.TTD:RegisterEvent("PLAYER_DEAD");

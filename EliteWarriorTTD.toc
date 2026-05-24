@@ -1,9 +1,7 @@
-## Interface: 11200
-## Title: EliteWarriorCombat |cff7fff7fClassic-WoW|r
+## Interface: 30300
+## Title: EliteWarriorTTD
 ## Notes: TimeTillDeath
-## SavedVariables: ConsumeList
-## SavedVariablesPerCharacter: ConsumeListChar ZGLootItemList
 ## Author: Hobbitt - TurtleWoW
+## SavedVariables: EliteWarriorTTDDB
 
-##
-elitewarrior_TTD.lua
+EliteWarriorTTD.lua
